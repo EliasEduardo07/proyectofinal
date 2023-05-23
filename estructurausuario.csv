@@ -1,0 +1,6 @@
+// Aqui guardo la estructura csv que creo que es necesaria para pedir en la app
+
+id_usuario,nombre,apellido,edad,genero,peso,altura,imc,restricciones,alergias,objetivo_perdida,objetivo_mantenimiento,objetivo_ganancia
+1,John,Doe,30,M,70,170,24.2,Vegetariano,Lactosa,2,
+2,Jane,Smith,25,F,60,165,22.0,Vegano,,1,,
+3,Mark,Johnson,40,M,80,180,24.7,,Nueces,,3,2
