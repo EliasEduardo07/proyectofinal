@@ -1,0 +1,91 @@
+import streamlit as st
+import csv
+from mlxtend.preprocessing import TransactionEncoder
+from mlxtend.frequent_patterns import apriori, association_rules
+
+# Definir la función para obtener los datos del usuario
+def obtener_datos_usuario():
+    st.header("Ingrese sus datos")
+
+    nombre = st.text_input("Nombre", max_chars=40)
+    apellido = st.text_input("Apellido", max_chars=15)
+    edad = st.text_input("Edad")
+    genero = st.selectbox("Género", ["Masculino", "Femenino", "Otro"])
+    peso = st.text_input("Peso (kg)")
+    altura = st.text_input("Altura (cm)")
+    imc = calcular_imc(peso, altura)
+    restricciones = st.multiselect("Restricciones dietéticas", ["Vegetariano", "Vegano", "Sin gluten", "Otro"])
+    alergias = st.text_input("Alergias alimentarias (separe con comas)")
+
+    return nombre, apellido, edad, genero, peso, altura, imc, restricciones, alergias
+
+# Función para calcular el IMC
+def calcular_imc(peso, altura):
+    try:
+        peso = float(peso)
+        altura = float(altura) / 100  # Convertir la altura a metros
+        imc = round(peso / (altura ** 2), 2)
+        return imc
+    except (ValueError, ZeroDivisionError):
+        return None
+
+# Función para realizar el análisis Apriori
+def realizar_analisis_apriori(datos_transacciones):
+    # Codificar las transacciones
+    te = TransactionEncoder()
+    te_ary = te.fit_transform(datos_transacciones)
+    df = pd.DataFrame(te_ary, columns=te.columns_)
+
+    # Aplicar el algoritmo Apriori
+    frequent_itemsets = apriori(df, min_support=0.1, use_colnames=True)
+
+    # Generar las reglas de asociación
+    rules = association_rules(frequent_itemsets, metric="confidence", min_threshold=0.5)
+
+    return frequent_itemsets, rules
+
+# Mostrar formulario y obtener los datos del usuario
+nombre, apellido, edad, genero, peso, altura, imc, restricciones, alergias = obtener_datos_usuario()
+
+# Verificar si se han ingresado datos
+if nombre and apellido and edad and genero and peso and altura and imc is not None:
+    # Validar que nombre y apellido contengan solo letras y espacios
+    if not nombre.replace(" ", "").isalpha() or not apellido.replace(" ", "").isalpha():
+        st.error("Ingrese un valor válido para el nombre y el apellido (solo letras y espacios).")
+    # Validar que edad, peso y altura contengan solo números
+    elif not edad.isdigit() or not peso.replace(".", "").isdigit() or not altura.isdigit():
+        st.error("Ingrese un valor válido para la edad, peso y altura (solo números).")
+    else:
+        # Crear una lista para almacenar el registro del usuario
+        registro_usuario = [nombre, apellido, edad, genero, peso, altura, imc, restricciones, alergias]
+
+        # Navegar a una siguiente página o sección
+        if st.button("Guardar"):
+            # Nombre del archivo para almacenar los registros en formato CSV
+            archivo = "datos_usuarios.csv"
+
+            # Escribir los datos en el archivo CSV
+            with open(archivo, "a", newline="") as f:
+                writer = csv.writer(f)
+                writer.writerow(registro_usuario)
+
+            # Leer los datos del archivo CSV
+            datos = []
+            with open(archivo, "r") as f:
+                reader = csv.reader(f)
+                next(reader)  # Saltar la primera fila (encabezados)
+                for row in reader:
+                    datos.append(row[8].split(", "))  # Obtener las alergias como lista
+
+            # Realizar el análisis Apriori
+            frequent_itemsets, rules = realizar_analisis_apriori(datos)
+
+            # Mostrar los resultados del análisis
+            st.subheader("Resultados del análisis Apriori")
+            st.dataframe(frequent_itemsets)
+            st.dataframe(rules)
+
+            # Mostrar mensaje de éxito
+            st.success("Los datos se han guardado correctamente en el archivo CSV y se ha realizado el análisis Apriori.")
+else:
+    st.info("Por favor, complete todos los campos antes de guardar.")
