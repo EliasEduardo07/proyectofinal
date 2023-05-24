@@ -1,4 +1,5 @@
 # en esta version hemos creado las paginas y generado las graficas de IMC, esta version 2.0 aun no esta lista y se espera que la version 3.0 ya tenga implementado el algoritmo apriori. 
+# se ha agregado los elif con la estructura de los demas algoritmos, estos estan vacios aclaro
 import streamlit as st
 import csv
 import matplotlib.pyplot as plt
@@ -86,3 +87,17 @@ if page == "Inicio":
 
     else:
         st.info("Por favor, complete todos los campos antes de guardar.")
+# Página del algoritmo Apriori
+elif page == "Algoritmo Apriori":
+    st.header("Algoritmo Apriori")
+    # Aquí deberías implementar y mostrar los resultados del algoritmo Apriori
+
+# Página de Métricas de Distancia
+elif page == "Métricas de Distancia":
+    st.header("Métricas de Distancia")
+    # Aquí deberías implementar y mostrar los resultados de las métricas de distancia
+
+# Página de Clustering Jerárquico Ascendente
+elif page == "Clustering Jerárquico Ascendente":
+    st.header("Clustering Jerárquico Ascendente")
+    # Aquí deberías implementar y mostrar los resultados del clustering jerárquico ascendente
